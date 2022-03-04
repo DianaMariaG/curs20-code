@@ -17,17 +17,17 @@ public class GroupingMain {
 
        Map<String, Integer> result = persons.stream()
                .collect(Collectors.toMap(person -> person.name(), person ->person.age()));
-        System.out.println(result);
+       System.out.println(result);
 
-        Map<String, String> collect = persons.stream()
+       Map<String, String> collect = persons.stream()
                 .collect(Collectors.toMap(Person::city, Person::name, (name1, name2) ->name1 + "," +name2 ));
-        System.out.println(collect);
+       System.out.println(collect);
 
-        Map<String, List<Person>> groupByCity = persons.stream()
+       Map<String, List<Person>> groupByCity = persons.stream()
                 .collect(Collectors.groupingBy(Person::city));
-        System.out.println(groupByCity);
+       System.out.println(groupByCity);
 
-        System.out.println(persons.stream()
+       System.out.println(persons.stream()
                 .collect(Collectors.groupingBy(Person::city, Collectors.mapping(person -> person.name(),Collectors.toList())))); //grupeaza dupa oras, iar valorile le grupeaza dupa name si pe pune intr-o lista
     }
 }

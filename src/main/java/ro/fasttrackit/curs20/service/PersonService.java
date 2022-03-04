@@ -19,7 +19,7 @@ public class PersonService {
     }
 
     public Person addPerson(Person person) {
-        return repository.save(person);
+        return repository.save(person); //save = adaugare
     }
 
 }
