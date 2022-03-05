@@ -12,7 +12,7 @@ import static ro.fasttrackit.curs20.homework.StringUtils.ensureNotNegative;
 public class Transaction {
     @Id
     @GeneratedValue
-    private Double id;
+    private int id;
     private String product;
     private Type type;
     private Double amount;
@@ -38,11 +38,11 @@ public class Transaction {
         return amount;
     }
 
-    public Double getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Double id) {
+    public void setId(int id) {
         this.id = id;
     }
 

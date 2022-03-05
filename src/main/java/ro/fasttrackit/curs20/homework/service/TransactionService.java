@@ -8,12 +8,14 @@ import ro.fasttrackit.curs20.repository.PersonRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TransactionService {
 
-    private final TransactionRepo repository; //repository e clasa care se ocupa de entitatea Person
+    private final TransactionRepo repository; //repository e clasa care se ocupa de entitatea
 
     public TransactionService(TransactionRepo repository) {
         this.repository = repository;
@@ -23,59 +25,53 @@ public class TransactionService {
         List<Transaction> result = new ArrayList<>();
         if (minAmount == null && maxAmount == null && type == null) {
             result = repository.findAll();
-        } else if (minAmount == null && maxAmount == null && type != null) {
+        } else if (minAmount == null && maxAmount == null) {
             result = repository.findByType(type);
         } else if (minAmount != null && maxAmount == null && type == null) {
             result = repository.findByAmountGreaterThan(minAmount);
-        } else if (minAmount == null && maxAmount != null && type == null) {
+        } else if (minAmount == null && type == null) {
             result = repository.findByAmountLessThan(maxAmount);
-        } else if (minAmount != null && maxAmount == null && type != null) {
+        } else if (minAmount != null && maxAmount == null) {
             result = repository.findByTypeAndAmountGreaterThan(type, minAmount);
-        } else if (minAmount == null && maxAmount != null && type != null) {
+        } else if (minAmount == null) {
             result = repository.findByTypeAndAmountLessThan(type, maxAmount);
-        } else if (minAmount != null && maxAmount != null && type == null) {
-            result = repository.findByAmountBetween(maxAmount, minAmount);
+        } else if (type == null) {
+            result = repository.findByAmountBetween(minAmount, maxAmount);
+        } else {
+            result = repository.findByTypeAndAmountBetween(type, minAmount, maxAmount);
         }
+        return result;
+    }
 
-        return result = repository.findByTypeAndAmountBetween(type, maxAmount, minAmount);
+    public Optional<Transaction> findById(int id) {
+        return repository.findById(id);
     }
 
     public Transaction addTransaction(Transaction transaction) {
         return repository.save(transaction);
     }
 
-    public Optional<Transaction> replace(Double id, Transaction transaction) {
-        return repository.findById(id)
-                .map(existing -> replaceExistingTransaction(existing, transaction));
+    public Transaction update(Transaction transaction) {
+        return repository.save(transaction);
     }
 
-    public Transaction replaceExistingTransaction(Transaction existing, Transaction replacedTransaction) {
-            repository.delete(existing);
-            Transaction newTransaction = cloneWithId(replacedTransaction);
-            repository.save(cloneWithId(newTransaction));
-            return newTransaction;
-    }
 
-    private Transaction cloneWithId(Transaction transaction) {
-        return new Transaction(
-                transaction.getProduct(),
-                transaction.getType(),
-                transaction.getAmount()
-        );
-    }
-
-    public Transaction findById (Double id, Transaction transaction) {
-        Transaction foundTransaction = null;
-        if (transaction.getId() == id) {
-            foundTransaction = transaction;
-        }
-        return foundTransaction;
-    }
-
-    public Optional<Transaction> deleteTransactionById(Double id) {
+    public Optional<Transaction> deleteTransactionById(int id) {
         Optional<Transaction> transactionToDelete = repository.findById(id);
         transactionToDelete.ifPresent(o -> repository.delete(o));
         return transactionToDelete;
+    }
+
+    public Map<Type, Double> mapTypeToSumOfAmount() {
+        Map<Type, Double> result = repository.findAll().stream()
+                .collect(Collectors.groupingBy(Transaction::getType, Collectors.summingDouble(Transaction::getAmount)));
+        return result;
+    }
+
+    public Map<String, Double> mapProductToSumOfAmount() {
+        Map<String, Double> result = repository.findAll().stream()
+                .collect(Collectors.groupingBy(Transaction::getProduct,Collectors.summingDouble(Transaction::getAmount)));
+        return result;
     }
 }
 

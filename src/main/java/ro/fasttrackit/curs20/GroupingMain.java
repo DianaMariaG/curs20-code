@@ -27,8 +27,8 @@ public class GroupingMain {
                 .collect(Collectors.groupingBy(Person::city));
        System.out.println(groupByCity);
 
-       System.out.println(persons.stream()
-                .collect(Collectors.groupingBy(Person::city, Collectors.mapping(person -> person.name(),Collectors.toList())))); //grupeaza dupa oras, iar valorile le grupeaza dupa name si pe pune intr-o lista
+       persons.stream()
+               .collect(Collectors.groupingBy(Person::city, Collectors.mapping(person -> person.name(), Collectors.toList())));//grupeaza dupa oras, iar valorile le grupeaza dupa name si pe pune intr-o lista
     }
 }
 record Person(String name, String city, int age) {
